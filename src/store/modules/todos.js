@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import axios from 'axios';
 
 const state = {
@@ -32,7 +33,12 @@ const actions = {
     async filterTodo({ commit }, limit) {
         const resp = await axios.get(`https://jsonplaceholder.typicode.com/todos?_limit=${limit.target.value}`);
         commit('setTodos', resp.data);
-    }
+    },
+
+    async updateTodo({ commit }, todo) {
+        const resp = await axios.put(`https://jsonplaceholder.typicode.com/todos/${todo.id}`, todo);
+        commit('updTodo', resp.data);
+    },
 };
 
 const mutation = {
@@ -46,6 +52,16 @@ const mutation = {
 
     removeTodo: (state, id) => {
         state.todos = state.todos.filter(todo => todo.id !== id);
+    },
+
+    updTodo: (state, todo) => {
+        // Find item index using _.findIndex
+        let index = _.findIndex(state.todos, { id: todo.id });
+
+        // Replace item at index using native splice
+        if (index !== -1) {
+            state.todos.splice(index, 1, todo);
+        }
     }
 
 };
